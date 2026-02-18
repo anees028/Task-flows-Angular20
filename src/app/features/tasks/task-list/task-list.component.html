@@ -1,0 +1,77 @@
+<div class="page-wrapper">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>Task Manager</h1>
+            <p>Symfony 7 + Angular 20 · Practice App</p>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-chip">
+                <span class="dot dot-total"></span>
+                {{ taskService.tasks().length }} Total
+            </div>
+            <div class="stat-chip">
+                <span class="dot dot-pending"></span>
+                {{ taskService.pendingCount() }} Pending
+            </div>
+            <div class="stat-chip">
+                <span class="dot dot-done"></span>
+                {{ taskService.completedCount() }} Done
+            </div>
+        </div>
+
+        <!-- Error -->
+        @if (taskService.error()) {
+        <div class="error-banner">⚠ {{ taskService.error() }}</div>
+        }
+
+        <!-- Form -->
+        <app-task-form (taskCreated)="onTaskCreated()" />
+
+        <!-- Loading -->
+        @if (taskService.loading()) {
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading tasks...</p>
+        </div>
+        }
+
+        <!-- Task List -->
+        @if (taskService.hasTasks() && !taskService.loading()) {
+        <ul class="task-list">
+            @for (task of taskService.tasks(); track task.id) {
+            <li class="task-card" [class.done]="task.isDone">
+
+                <div class="task-left">
+                    <button class="check-btn" [class.checked]="task.isDone" (click)="toggleDone(task)"
+                        [title]="task.isDone ? 'Mark as pending' : 'Mark as done'">
+                    </button>
+                    <div class="task-content">
+                        <div class="task-title">{{ task.title }}</div>
+                        @if (task.description) {
+                        <div class="task-desc">{{ task.description }}</div>
+                        }
+                        <div class="task-meta">{{ task.createdAt | date:'MMM d, y · h:mm a' }}</div>
+                    </div>
+                </div>
+
+                <button class="delete-btn" (click)="deleteTask(task.id)" title="Delete">✕</button>
+
+            </li>
+            }
+        </ul>
+        }
+
+        <!-- Empty State -->
+        @if (!taskService.hasTasks() && !taskService.loading()) {
+        <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <p>No tasks yet. Add your first one above!</p>
+        </div>
+        }
+
+    </div>
+</div>
